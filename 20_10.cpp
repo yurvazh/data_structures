@@ -18,7 +18,7 @@ public:
 class list {
 public:
     Node* head;
-    Node* tall;
+    Node* tail;
     bool empty();
     void push_front(int p);
     void push_back(int p);
@@ -29,7 +29,7 @@ public:
     void pop_middle(int in);
     void pop_value(int v);
     int search_value(int v);
-    int& operator[](int i);
+    int operator[](int i);
     void sort();
     friend ostream& operator<<(ostream&, const list&);
 };
@@ -51,28 +51,28 @@ bool list::empty() {
 
 void list::push_front(int p) {
     head = new Node(p, head);
-    if (tall == nullptr) {
-        tall = head;
+    if (tail == nullptr) {
+        tail = head;
     }
 }
 
 void list::push_back(int p) {
     Node* newtall = new Node(p);
-    tall -> next = newtall;
-    tall = newtall;
+    tail -> next = newtall;
+    tail = newtall;
     if (head == nullptr) {
-        head = tall;
+        head = tail;
     }
 }
 
 list::list(){
-    head = tall = nullptr;
+    head = tail = nullptr;
 }
 void list::push_middle(int in, int p) {
     if (in == 0) {
         head = new Node(p, head);
-        if (tall == nullptr) {
-            tall = head;
+        if (tail == nullptr) {
+            tail = head;
         }
         return;
     }
@@ -84,19 +84,34 @@ void list::push_middle(int in, int p) {
 }
 
 void list::pop_front(){
-    head = head -> next;
+    if (head == tail) {
+        head = tail = nullptr;
+        return;
+    }
+    Node* m = head -> next;
+    swap(head, m);
+    delete(m);
 };
 
 void list::pop_back() {
+    if (head == tail) {
+        head = tail = nullptr;
+        return;
+    }
     Node* after = head;
-    while(after->next != tall) {
+    while(after->next != tail) {
         after = after->next;
     }
-    after->next = nullptr;
-    tall = after;
+    swap(tail, after);
+    tail -> next = nullptr;
+    delete(after);
 }
 
 void list::pop_middle(int in) {
+    if (head == tail) {
+        head = tail = nullptr;
+        return;
+    }
     if (in == 0) {
         head = head -> next;
         return;
@@ -110,6 +125,9 @@ void list::pop_middle(int in) {
 }
 
 void list::pop_value(int t) {
+    if (head == tail) {
+        head = tail = nullptr;
+    }
     if (head->value == t) {
         head = head->next;
     }
@@ -140,10 +158,16 @@ int list::search_value(int t) {
     }
 }
 
-int& list::operator[](int in) {
+int list::operator[](int in) {
     Node* after = head;
     for (int i = 0; i < in; i++) {
         after = after->next;
+        if (after == nullptr) {
+            return -1;
+        }
+    }
+    if ((in < 0) || (after == nullptr)) {
+        return -1;
     }
     return after->value;
 }
@@ -152,8 +176,10 @@ void list::sort() {
     deque<Node*> d;
     Node* after = head;
     while (after != nullptr) {
-        d.push_front(new Node(after->value));
-        after = after->next;
+        Node* m = after->next;
+        after->next = nullptr;
+        d.push_back(after);
+        after = m;
     }
     while (d.size() != 1) {
         Node* head1 = d.front();
@@ -167,9 +193,11 @@ void list::sort() {
         }
         while (head2 != nullptr) {
             if ((now->next == nullptr) || (head2->value < now->next->value)) {
-                now->next = new Node(head2->value, now->next);
+                Node* m = head2->next;
+                head2->next = now->next;
+                now->next = head2;
                 now = now->next;
-                head2 = head2->next;
+                head2 = m;
             } else {
                 now = now->next;
             }
@@ -177,9 +205,9 @@ void list::sort() {
         d.push_back(head1);
     }
     head = d.front();
-    tall = d.front();
-    while(tall->next != nullptr) {
-        tall = tall->next;
+    tail = d.front();
+    while(tail->next != nullptr) {
+        tail = tail->next;
     }
 }
 
