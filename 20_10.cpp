@@ -24,6 +24,7 @@ public:
     void push_back(int p);
     void push_middle(int in, int p);
     void pop_front();
+    list();
     void pop_back();
     void pop_middle(int in);
     void pop_value(int v);
@@ -32,6 +33,7 @@ public:
     void sort();
     friend ostream& operator<<(ostream&, const list&);
 };
+
 
 Node::Node (int t) {
     value = t;
@@ -63,6 +65,9 @@ void list::push_back(int p) {
     }
 }
 
+list::list(){
+    head = tall = nullptr;
+}
 void list::push_middle(int in, int p) {
     if (in == 0) {
         head = new Node(p, head);
@@ -189,7 +194,7 @@ ostream& operator<<(ostream& out, const list& a) {
 }
 
 int main() {
-    list a;
+    list a = list();
     cout << "now list is empty\n";
     cout << "1 - empty or not\n";
     cout << "2 - push front\n";
@@ -222,7 +227,10 @@ int main() {
             int y;
             cout << "value: ";
             cin >> y;
-            a.push_back(y);
+            if (a.empty())
+                a.push_front(y);
+            else
+                a.push_back(y);
             cout << a;
         }
         if (num == 4) {
