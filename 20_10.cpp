@@ -104,7 +104,9 @@ void list::pop_back() {
     }
     swap(tail, after);
     tail -> next = nullptr;
-    delete(after);
+    if (after != head) {
+        delete (after);
+    }
 }
 
 void list::pop_middle(int in) {
@@ -118,26 +120,47 @@ void list::pop_middle(int in) {
     }
     Node* after = head;
     for (int i = 1; i < in; i++) {
+        if (after == nullptr) {
+            cout << "incorrect index" << endl;
+            return;
+        }
         after = after->next;
+    }
+    if (((after == nullptr) || (after->next == nullptr)) || (in < 0)) {
+        cout << "incorrect index" << endl;
+        return;
+    }
+    if (after->next == tail) {
+        after->next = after->next->next;
+        tail = after;
+        return;
     }
     after->next = after->next->next;
     return;
 }
-
 void list::pop_value(int t) {
     if (head == tail) {
         head = tail = nullptr;
+        return;
     }
     if (head->value == t) {
         head = head->next;
+        return;
     }
     Node* after = head;
     while ((after->next != nullptr) && (after->next->value != t)){
         after = after->next;
     }
-    if (after->next->value == t) {
+    if ((after->next == tail) && (after->next->value == t)) {
         after->next = after->next->next;
+        tail = after;
+        return;
     }
+    if ((after->next != nullptr) && (after->next->value == t)) {
+        after->next = after->next->next;
+        return;
+    }
+    cout << "incorrect value" << endl;
     return;
 }
 
@@ -161,13 +184,15 @@ int list::search_value(int t) {
 int list::operator[](int in) {
     Node* after = head;
     for (int i = 0; i < in; i++) {
-        after = after->next;
         if (after == nullptr) {
-            return -1;
+            cout << "incorrect index" << endl;
+            return -2000000000;
         }
+        after = after->next;
     }
     if ((in < 0) || (after == nullptr)) {
-        return -1;
+       cout << "incorrect index" << endl;
+       return -2000000000;
     }
     return after->value;
 }
@@ -300,7 +325,9 @@ int main() {
             int pos;
             cout << "index: ";
             cin >> pos;
-            cout << a[pos] << endl;
+            if (a[pos] != -2000000000) {
+                cout << a[pos] << endl;
+            }
         }
         if (num == 11) {
             a.sort();
